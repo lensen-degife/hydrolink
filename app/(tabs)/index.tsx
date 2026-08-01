@@ -1,98 +1,213 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  CommunityNewsSection,
+  CurrentBillCard,
+  DashboardModals,
+  EmergencySupportCard,
+  FloatingActionButton,
+  HeroStatusCard,
+  NewsItem,
+  PaymentTransaction,
+  QuickActionsGrid,
+  RecentPaymentsCard,
+  ServiceRequestsCard,
+  TodaySummaryGrid,
+  TopAppBar,
+  WaterScheduleCard,
+  WaterUsageCard,
+  useDashboardTheme,
+} from '@/components/dashboard';
+import { AnimatedScreen } from '@/components/auth';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+type ActiveModalState =
+  | { type: 'pay_bill' }
+  | { type: 'schedule' }
+  | { type: 'report_issue' }
+  | { type: 'notifications' }
+  | { type: 'news'; item: NewsItem }
+  | { type: 'receipt'; month: string; amount: string; method: string }
+  | { type: 'scan_meter' }
+  | { type: 'profile' }
+  | null;
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { colors } = useDashboardTheme();
+  const [activeModal, setActiveModal] = useState<ActiveModalState>(null);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  // Handle Quick Action clicks
+  const handleQuickAction = (actionId: string) => {
+    switch (actionId) {
+      case 'pay_bill':
+        setActiveModal({ type: 'pay_bill' });
+        break;
+      case 'schedule':
+        setActiveModal({ type: 'schedule' });
+        break;
+      case 'report_issue':
+        setActiveModal({ type: 'report_issue' });
+        break;
+      case 'announcements':
+        setActiveModal({
+          type: 'news',
+          item: {
+            id: 'news_main',
+            category: 'Water Maintenance',
+            title: 'Scheduled Pipeline Upgrades in Kebele 01',
+            description:
+              'Routine maintenance and filter replacement scheduled on Thursday from 2:00 PM to 5:00 PM.',
+            date: 'Aug 02, 2026',
+            badgeBg: colors.primaryContainer,
+            badgeText: colors.primary,
+          },
+        });
+        break;
+      case 'scan_meter':
+        setActiveModal({ type: 'scan_meter' });
+        break;
+      case 'payment_history':
+        setActiveModal({
+          type: 'receipt',
+          month: 'July 2026',
+          amount: '420 ETB',
+          method: 'Telebirr',
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Handle Floating Action Button menu clicks
+  const handleFabAction = (actionId: string) => {
+    if (actionId === 'report_leak' || actionId === 'emergency_call') {
+      setActiveModal({ type: 'report_issue' });
+    } else if (actionId === 'new_request') {
+      setActiveModal({ type: 'schedule' });
+    } else if (actionId === 'contact_office') {
+      setActiveModal({ type: 'notifications' });
+    }
+  };
+
+  return (
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
+      <AnimatedScreen delay={100}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Top App Bar */}
+          <TopAppBar
+            onPressNotifications={() => setActiveModal({ type: 'notifications' })}
+            onPressProfile={() => setActiveModal({ type: 'profile' })}
+            unreadCount={3}
+          />
+
+          {/* Hero Card (Community Status) */}
+          <HeroStatusCard
+            onPressSchedule={() => setActiveModal({ type: 'schedule' })}
+          />
+
+          {/* Today's Summary Grid */}
+          <TodaySummaryGrid
+            onPressCard={(type) => {
+              if (type === 'pending_bill') setActiveModal({ type: 'pay_bill' });
+              else if (type === 'active_reports') setActiveModal({ type: 'report_issue' });
+              else if (type === 'announcements')
+                setActiveModal({
+                  type: 'news',
+                  item: {
+                    id: 'news_1',
+                    category: 'Water Maintenance',
+                    title: 'Scheduled Pipeline Upgrades in Kebele 01',
+                    description:
+                      'Routine maintenance and filter replacement scheduled on Thursday from 2:00 PM to 5:00 PM.',
+                    date: 'Aug 02, 2026',
+                    badgeBg: colors.primaryContainer,
+                    badgeText: colors.primary,
+                  },
+                });
+              else setActiveModal({ type: 'schedule' });
+            }}
+          />
+
+          {/* Quick Actions Grid */}
+          <QuickActionsGrid onActionPress={handleQuickAction} />
+
+          {/* Current Bill Card */}
+          <CurrentBillCard
+            onPayNow={() => setActiveModal({ type: 'pay_bill' })}
+            onViewDetails={() => setActiveModal({ type: 'pay_bill' })}
+          />
+
+          {/* Today's Water Schedule Timeline Card */}
+          <WaterScheduleCard
+            onViewWeeklySchedule={() => setActiveModal({ type: 'schedule' })}
+          />
+
+          {/* Latest Community News Horizontal List */}
+          <CommunityNewsSection
+            onSelectNews={(item) => setActiveModal({ type: 'news', item })}
+          />
+
+          {/* Water Usage Analytics Card */}
+          <WaterUsageCard />
+
+          {/* Recent Payments Transaction Card */}
+          <RecentPaymentsCard
+            onViewAll={() =>
+              setActiveModal({
+                type: 'receipt',
+                month: 'July 2026',
+                amount: '420 ETB',
+                method: 'Telebirr',
+              })
+            }
+            onSelectReceipt={(tx: PaymentTransaction) =>
+              setActiveModal({
+                type: 'receipt',
+                month: tx.month,
+                amount: tx.amount,
+                method: tx.method,
+              })
+            }
+          />
+
+          {/* Service Requests Tracker Card */}
+          <ServiceRequestsCard
+            onPressRequestDetails={() => setActiveModal({ type: 'report_issue' })}
+          />
+
+          {/* Emergency Support Card */}
+          <EmergencySupportCard
+            onReportNow={() => setActiveModal({ type: 'report_issue' })}
+          />
+
+          <View style={styles.bottomSpacer} />
+        </ScrollView>
+      </AnimatedScreen>
+
+      {/* Floating Action Button (FAB) */}
+      <FloatingActionButton onSelectAction={handleFabAction} />
+
+      {/* Interactive Sheet / Modals */}
+      <DashboardModals
+        activeModal={activeModal}
+        onClose={() => setActiveModal(null)}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  safeArea: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  scrollContent: {
+    paddingBottom: 40,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  bottomSpacer: {
+    height: 60,
   },
 });

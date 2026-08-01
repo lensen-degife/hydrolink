@@ -1,0 +1,128 @@
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useDashboardTheme } from '@/components/dashboard';
+import { useRouter } from 'expo-router';
+
+export default function ProfileScreen() {
+  const { colors, isDark, toggleTheme } = useDashboardTheme();
+  const router = useRouter();
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Customer Profile</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            HydroLink Smart Utility Account Settings
+          </Text>
+        </View>
+
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={styles.avatarRow}>
+            <View style={[styles.avatarCircle, { backgroundColor: colors.primaryContainer }]}>
+              <Ionicons name="person" size={32} color={colors.primary} />
+            </View>
+            <View>
+              <Text style={[styles.name, { color: colors.textPrimary }]}>Abebe Bikila</Text>
+              <Text style={[styles.id, { color: colors.textMuted }]}>ID: HL-884920 • Kebele 01</Text>
+            </View>
+          </View>
+
+          <View style={[styles.menuList, { borderTopColor: colors.borderLight }]}>
+            <Pressable onPress={toggleTheme} style={styles.menuItem}>
+              <Ionicons name={isDark ? 'sunny-outline' : 'moon-outline'} size={22} color={colors.primary} />
+              <Text style={[styles.menuText, { color: colors.textPrimary }]}>
+                {isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              </Text>
+            </Pressable>
+
+            <Pressable style={styles.menuItem}>
+              <Ionicons name="shield-checkmark-outline" size={22} color={colors.primary} />
+              <Text style={[styles.menuText, { color: colors.textPrimary }]}>Security & Biometrics</Text>
+            </Pressable>
+
+            <Pressable style={styles.menuItem}>
+              <Ionicons name="help-buoy-outline" size={22} color={colors.primary} />
+              <Text style={[styles.menuText, { color: colors.textPrimary }]}>Support & FAQs</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => router.replace('/(auth)/login')}
+              style={[styles.menuItem, { marginTop: 10 }]}
+            >
+              <Ionicons name="log-out-outline" size={22} color={colors.error} />
+              <Text style={[styles.menuText, { color: colors.error }]}>Log Out</Text>
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '800',
+  },
+  subtitle: {
+    fontSize: 13,
+    marginTop: 4,
+  },
+  card: {
+    marginHorizontal: 20,
+    marginTop: 16,
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+  },
+  avatarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 20,
+  },
+  avatarCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  id: {
+    fontSize: 13,
+    marginTop: 2,
+  },
+  menuList: {
+    borderTopWidth: 1,
+    paddingTop: 12,
+    gap: 14,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 8,
+  },
+  menuText: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+});
