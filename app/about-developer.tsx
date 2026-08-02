@@ -93,7 +93,7 @@ export default function AboutDeveloperScreen() {
           <View style={[styles.avatar, DashboardShadows.medium, { backgroundColor: colors.primaryContainer, borderColor: colors.surface }]}>
             <Ionicons name="person" size={68} color={colors.primary} />
           </View>
-          <Text style={[styles.name, { color: colors.textPrimary }]}>Lensen</Text>
+          <Text style={[styles.name, { color: colors.textPrimary }]}>Lensen Degife</Text>
           <Text style={[styles.role, { color: colors.primary }]}>Full Stack Software Developer</Text>
         </Animated.View>
 
