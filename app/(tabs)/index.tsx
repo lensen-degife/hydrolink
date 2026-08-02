@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   CommunityNewsSection,
@@ -20,6 +20,7 @@ import {
   useDashboardTheme,
 } from '@/components/dashboard';
 import { AnimatedScreen } from '@/components/auth';
+import { useRouter } from 'expo-router';
 
 type ActiveModalState =
   | { type: 'pay_bill' }
@@ -34,6 +35,7 @@ type ActiveModalState =
 
 export default function HomeScreen() {
   const { colors } = useDashboardTheme();
+  const router = useRouter();
   const [activeModal, setActiveModal] = useState<ActiveModalState>(null);
 
   // Handle Quick Action clicks
@@ -184,6 +186,15 @@ export default function HomeScreen() {
             onReportNow={() => setActiveModal({ type: 'report_issue' })}
           />
 
+          <Pressable
+            accessibilityRole="button"
+            android_ripple={{ color: colors.primaryContainer }}
+            onPress={() => router.push('/about-developer')}
+            style={({ pressed }) => [styles.developerFooter, { opacity: pressed ? 0.78 : 1 }]}
+          >
+            <Text style={[styles.developerFooterText, { color: colors.textMuted }]}>Made with ❤️ by Lensen</Text>
+          </Pressable>
+
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </AnimatedScreen>
@@ -209,5 +220,18 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 60,
+  },
+  developerFooter: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    borderRadius: 14,
+    marginTop: 8,
+    overflow: 'hidden',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  developerFooterText: {
+    fontSize: 13,
+    fontWeight: '700',
   },
 });

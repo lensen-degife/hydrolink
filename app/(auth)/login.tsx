@@ -57,6 +57,7 @@ export default function LoginScreen() {
           title="Welcome back"
           subtitle="Sign in to manage your water account"
           showBack
+          onBack={() => router.replace('/(auth)/welcome')}
         />
 
         <AuthTextInput

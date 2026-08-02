@@ -1,10 +1,10 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemeProvider, useDashboardTheme } from '@/components/dashboard/ThemeContext';
+import { useDashboardTheme } from '@/components/dashboard/ThemeContext';
 
 function TabNavigatorContent() {
-  const { colors, isDark } = useDashboardTheme();
+  const { colors } = useDashboardTheme();
 
   return (
     <Tabs
@@ -75,9 +75,5 @@ function TabNavigatorContent() {
 }
 
 export default function TabLayout() {
-  return (
-    <ThemeProvider>
-      <TabNavigatorContent />
-    </ThemeProvider>
-  );
+  return <TabNavigatorContent />;
 }

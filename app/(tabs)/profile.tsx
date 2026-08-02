@@ -48,6 +48,12 @@ export default function ProfileScreen() {
               <Text style={[styles.menuText, { color: colors.textPrimary }]}>Support & FAQs</Text>
             </Pressable>
 
+            <Pressable onPress={() => router.push('/about-developer')} style={styles.menuItem}>
+              <Ionicons name="code-slash-outline" size={22} color={colors.primary} />
+              <Text style={[styles.menuText, { color: colors.textPrimary }]}>About the Developer</Text>
+              <Ionicons name="chevron-forward" size={18} color={colors.textMuted} style={styles.chevron} />
+            </Pressable>
+
             <Pressable
               onPress={() => router.replace('/(auth)/login')}
               style={[styles.menuItem, { marginTop: 10 }]}
@@ -124,5 +130,8 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 15,
     fontWeight: '600',
+  },
+  chevron: {
+    marginLeft: 'auto',
   },
 });
