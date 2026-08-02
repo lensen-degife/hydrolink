@@ -16,10 +16,10 @@ import { useDashboardTheme } from '@/components/dashboard';
 import { DashboardShadows } from '@/constants/dashboard-theme';
 
 const developerLinks = {
-  email: 'mailto:lensen@example.com',
-  github: 'https://github.com/your-username',
-  linkedIn: 'https://www.linkedin.com/in/your-profile',
-  portfolio: 'https://your-portfolio.example.com',
+  email: 'mailto:lensendegife@example.com',
+  github: 'https://github.com/lensen-degife',
+  linkedIn: 'https://www.linkedin.com/in/lensen-degife-60661b3b2/',
+  portfolio: 'https://lensen-degife.github.io/my-portifolio1/',
 };
 
 function AnimatedCard({ children, delay }: { children: React.ReactNode; delay: number }) {
