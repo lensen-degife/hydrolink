@@ -16,7 +16,7 @@ import { useDashboardTheme } from '@/components/dashboard';
 import { DashboardShadows } from '@/constants/dashboard-theme';
 
 const developerLinks = {
-  email: 'mailto:lensendegife@example.com',
+  email: 'mailto:lensendegife@gmail.com',
   github: 'https://github.com/lensen-degife',
   linkedIn: 'https://www.linkedin.com/in/lensen-degife-60661b3b2/',
   portfolio: 'https://lensen-degife.github.io/my-portifolio1/',
@@ -136,10 +136,10 @@ export default function AboutDeveloperScreen() {
               <DeveloperActionButton colors={colors} icon="send-outline" label="Send Email" onPress={() => openLink(developerLinks.email)} />
             </View>
             <View style={[styles.contactDivider, { backgroundColor: colors.borderLight }]} />
-            <DetailRow icon="mail-outline" label="Email" value="lensen@example.com" />
-            <DetailRow icon="logo-github" label="GitHub" value="github.com/your-username" />
-            <DetailRow icon="logo-linkedin" label="LinkedIn" value="linkedin.com/in/your-profile" />
-            <DetailRow icon="globe-outline" label="Portfolio Website" value="your-portfolio.example.com" />
+            <DetailRow icon="mail-outline" label="Email" value="lensendegife@gmail.com" />
+            <DetailRow icon="logo-github" label="GitHub" value="github.com/lensen-degife" />
+            <DetailRow icon="logo-linkedin" label="LinkedIn" value="linkedin.com/in/lensen-degife-60661b3b2/" />
+            <DetailRow icon="globe-outline" label="Portfolio Website" value="lensen-degife.github.io/my-portifolio1/" />
             <DetailRow icon="location-outline" label="Location" value="Ethiopia" />
           </DeveloperSection>
         </AnimatedCard>
@@ -154,7 +154,7 @@ export default function AboutDeveloperScreen() {
           </View>
         </AnimatedCard>
 
-        <Text style={[styles.footer, { color: colors.textMuted }]}>© 2026 HydroLink{`\n`}Designed and Developed by Lensen.</Text>
+        <Text style={[styles.footer, { color: colors.textMuted }]}>© 2026 HydroLink{`\n`}Designed and Developed by Lensen Degife.</Text>
       </ScrollView>
     </SafeAreaView>
   );
