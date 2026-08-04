@@ -86,7 +86,7 @@ export default function ResetPasswordScreen() {
 
         <View style={styles.infoBox}>
           <Text style={styles.infoText}>
-            Choose a password that's different from your previous one. Use at least 8 characters
+            Choose a password that&apos;s different from your previous one. Use at least 8 characters
             with uppercase, lowercase, and numbers.
           </Text>
         </View>
