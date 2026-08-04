@@ -59,7 +59,7 @@ export default function ForgotPasswordScreen() {
         <View style={styles.infoBox}>
           <Text style={styles.infoIcon}>📧</Text>
           <Text style={styles.infoText}>
-            Enter the email address associated with your HydroLink account. We'll send you a
+            Enter the email address associated with your HydroLink account. We&apos;ll send you a
             6-digit verification code.
           </Text>
         </View>
