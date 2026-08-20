@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import { login as loginApi } from '@/services/auth';
+import { ApiError } from '@/services/api';
 
 import {
   AnimatedScreen,
@@ -14,6 +16,7 @@ import {
 } from '@/components/auth';
 import { HydroColors, HydroSpacing, HydroTypography } from '@/constants/auth-theme';
 import { loginSchema, validateForm, type LoginFormData } from '@/utils/validation';
+// If you prefer, import ApiError from '@/services/api' instead
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -40,9 +43,18 @@ export default function LoginScreen() {
     }
 
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setLoading(false);
-    router.replace('/(tabs)');
+    try {
+      await loginApi(result.data.email, result.data.password);
+      router.replace('/(tabs)');
+    } catch (err) {
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : 'Unable to sign in. Check your connection and try again.';
+      Alert.alert('Login failed', message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -109,9 +121,7 @@ export default function LoginScreen() {
         />
 
         <View style={styles.securityNote}>
-          <Text style={styles.securityText}>
-            🔒 Secured with 256-bit encryption
-          </Text>
+          <Text style={styles.securityText}>🔒 Secured with 256-bit encryption</Text>
         </View>
       </AnimatedScreen>
     </AuthLayout>
