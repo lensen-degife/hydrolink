@@ -1,8 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
-import { login as loginApi } from '@/services/auth';
-import { ApiError } from '@/services/api';
 
 import {
   AnimatedScreen,
@@ -16,7 +14,8 @@ import {
 } from '@/components/auth';
 import { HydroColors, HydroSpacing, HydroTypography } from '@/constants/auth-theme';
 import { loginSchema, validateForm, type LoginFormData } from '@/utils/validation';
-// If you prefer, import ApiError from '@/services/api' instead
+import { login as loginApi } from '@/services/auth';
+import { ApiError } from '@/services/api';
 
 export default function LoginScreen() {
   const router = useRouter();
