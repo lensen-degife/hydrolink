@@ -59,3 +59,52 @@ export async function clearSession() {
   await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
   await SecureStore.deleteItemAsync(USER_KEY);
 }
+// ... existing imports and code ...
+
+export type RegisterInput = {
+  fullName: string;
+  email: string;
+  phone: string;
+  accountNumber: string;
+  password: string;
+};
+
+export type RegisterResult = {
+  id: string;
+  email: string;
+  fullName: string;
+};
+
+export async function register(input: RegisterInput): Promise<RegisterResult> {
+  return apiRequest<RegisterResult>('/auth/register', {
+    method: 'POST',
+    body: {
+      fullName: input.fullName,
+      email: input.email,
+      phone: input.phone,
+      accountNumber: input.accountNumber,
+      password: input.password,
+    },
+  });
+}
+
+export async function sendOtp(
+  email: string,
+  purpose: 'register' | 'reset',
+): Promise<{ expiresInMinutes?: number } | null> {
+  return apiRequest<{ expiresInMinutes?: number } | null>('/auth/otp/send', {
+    method: 'POST',
+    body: { email, purpose },
+  });
+}
+
+export async function verifyOtp(
+  email: string,
+  otp: string,
+  purpose: 'register' | 'reset',
+): Promise<null> {
+  return apiRequest<null>('/auth/otp/verify', {
+    method: 'POST',
+    body: { email, otp, purpose },
+  });
+}

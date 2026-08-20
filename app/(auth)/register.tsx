@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import {
   AnimatedScreen,
@@ -13,6 +13,8 @@ import {
 } from '@/components/auth';
 import { HydroColors, HydroSpacing, HydroTypography } from '@/constants/auth-theme';
 import { registerSchema, validateForm, type RegisterFormData } from '@/utils/validation';
+import { register as registerApi } from '@/services/auth';
+import { ApiError } from '@/services/api';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -46,13 +48,27 @@ export default function RegisterScreen() {
     }
 
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setLoading(false);
+    try {
+      // confirmPassword is only for client validation — don't send it
+      const { confirmPassword: _, ...payload } = result.data;
+      await registerApi(payload);
 
-    router.push({
-      pathname: '/(auth)/otp-verification',
-      params: { email: form.email, flow: 'register' },
-    });
+      router.push({
+        pathname: '/(auth)/otp-verification',
+        params: { email: result.data.email, flow: 'register' },
+      });
+    } catch (err) {
+      console.log('REGISTER ERROR:', err);
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Unable to create account. Try again.';
+      Alert.alert('Registration failed', message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -89,7 +105,7 @@ export default function RegisterScreen() {
         <AuthTextInput
           label="Phone Number"
           icon="call-outline"
-          placeholder="+1 (555) 000-0000"
+          placeholder="+251911234567"
           value={form.phone}
           onChangeText={(v) => updateField('phone', v)}
           error={errors.phone}

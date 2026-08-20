@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import {
   AnimatedScreen,
@@ -11,14 +11,16 @@ import {
 } from '@/components/auth';
 import { HydroColors, HydroSpacing, HydroTypography } from '@/constants/auth-theme';
 import { otpSchema, validateForm } from '@/utils/validation';
+import { sendOtp, verifyOtp } from '@/services/auth';
+import { ApiError } from '@/services/api';
 
 const RESEND_COOLDOWN = 60;
 
 export default function OTPVerificationScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ email?: string; flow?: string }>();
-  const email = params.email ?? 'your email';
-  const flow = params.flow ?? 'register';
+  const email = params.email ?? '';
+  const flow = (params.flow === 'reset' ? 'reset' : 'register') as 'register' | 'reset';
 
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
@@ -35,15 +37,37 @@ export default function OTPVerificationScreen() {
     return () => clearTimeout(timer);
   }, [countdown]);
 
-  const handleResend = useCallback(() => {
-    if (!canResend) return;
+  const handleResend = useCallback(async () => {
+    if (!canResend || !email) return;
+
     setCountdown(RESEND_COOLDOWN);
     setCanResend(false);
     setOtp('');
     setError('');
-  }, [canResend]);
+
+    try {
+      await sendOtp(email, flow);
+      Alert.alert('Code sent', 'A new verification code was sent. Check Render logs for the OTP.');
+    } catch (err) {
+      console.log('RESEND OTP ERROR:', err);
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Could not resend code.';
+      Alert.alert('Resend failed', message);
+      setCanResend(true);
+      setCountdown(0);
+    }
+  }, [canResend, email, flow]);
 
   const handleVerify = async () => {
+    if (!email) {
+      setError('Missing email. Go back and try again.');
+      return;
+    }
+
     const result = validateForm(otpSchema, { otp });
     if (!result.success) {
       setError(result.errors.otp ?? 'Invalid code');
@@ -52,22 +76,37 @@ export default function OTPVerificationScreen() {
 
     setError('');
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setLoading(false);
+    try {
+      await verifyOtp(email, result.data.otp, flow);
 
-    if (flow === 'reset') {
-      router.push({
-        pathname: '/(auth)/reset-password',
-        params: { email },
-      });
-    } else {
-      router.replace('/(tabs)');
+      if (flow === 'reset') {
+        router.push({
+          pathname: '/(auth)/reset-password',
+          params: { email, otp: result.data.otp }, // needed later for reset-password API
+        });
+      } else {
+        // Register does not return tokens — user must sign in
+        Alert.alert('Verified', 'Your email is verified. Please sign in.', [
+          { text: 'Sign in', onPress: () => router.replace('/(auth)/login') },
+        ]);
+      }
+    } catch (err) {
+      console.log('VERIFY OTP ERROR:', err);
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Invalid or expired code.';
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const maskedEmail = email.includes('@')
     ? email.replace(/(.{2})(.*)(@.*)/, '$1***$3')
-    : email;
+    : email || 'your email';
 
   return (
     <AuthLayout showGradient={false}>
@@ -108,7 +147,7 @@ export default function OTPVerificationScreen() {
 
         <View style={styles.hint}>
           <Text style={styles.hintText}>
-            Didn't receive the code? Check your spam folder or try a different email address.
+            Dev mode: OTP is printed in Render logs as [OTP] email (register): ######
           </Text>
         </View>
       </AnimatedScreen>
