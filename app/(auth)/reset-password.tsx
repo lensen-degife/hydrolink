@@ -12,10 +12,14 @@ import {
 } from '@/components/auth';
 import { HydroColors, HydroSpacing, HydroTypography } from '@/constants/auth-theme';
 import { resetPasswordSchema, validateForm, type ResetPasswordFormData } from '@/utils/validation';
+import { resetPassword } from '@/services/auth';
+import { ApiError } from '@/services/api';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ email?: string }>();
+  const params = useLocalSearchParams<{ email?: string; otp?: string }>();
+  const email = params.email ?? '';
+  const otp = params.otp ?? '';
 
   const [form, setForm] = useState<ResetPasswordFormData>({
     password: '',
@@ -37,6 +41,11 @@ export default function ResetPasswordScreen() {
   };
 
   const handleReset = async () => {
+    if (!email || !otp) {
+      setErrors({ password: 'Missing verification session. Please request a new code.' });
+      return;
+    }
+
     const result = validateForm(resetPasswordSchema, form);
     if (!result.success) {
       setErrors(result.errors);
@@ -44,13 +53,24 @@ export default function ResetPasswordScreen() {
     }
 
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setLoading(false);
-    setSuccess(true);
+    try {
+      await resetPassword(email, otp, form.password);
+      setSuccess(true);
 
-    setTimeout(() => {
-      router.replace('/(auth)/login');
-    }, 2000);
+      setTimeout(() => {
+        router.replace('/(auth)/login');
+      }, 2000);
+    } catch (err) {
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Could not reset password.';
+      setErrors({ password: message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (success) {
@@ -77,8 +97,8 @@ export default function ResetPasswordScreen() {
         <AuthHeader
           title="New password"
           subtitle={
-            params.email
-              ? `Create a new password for ${params.email}`
+            email
+              ? `Create a new password for ${email}`
               : 'Create a strong new password'
           }
           showBack

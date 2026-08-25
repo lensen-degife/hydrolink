@@ -26,7 +26,7 @@ export type DashboardData = {
   notifications: AppNotification[];
 };
 
-const empty: DashboardData = {
+const emptyData: DashboardData = {
   user: null,
   bill: null,
   payments: [],
@@ -39,7 +39,7 @@ const empty: DashboardData = {
 };
 
 export function useDashboardData() {
-  const [data, setData] = useState<DashboardData>(empty);
+  const [data, setData] = useState<DashboardData>(emptyData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

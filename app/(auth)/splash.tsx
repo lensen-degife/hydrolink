@@ -13,6 +13,7 @@ import Animated, {
 
 import { FadeInView, HydroLogo, HydroWordmark, WaveDecoration } from '@/components/auth';
 import { HydroColors } from '@/constants/auth-theme';
+import { getAccessToken, getStoredUser, refreshTokens } from '@/services/auth';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -32,11 +33,34 @@ export default function SplashScreenRoute() {
       withTiming(1, { duration: 1800, easing: Easing.inOut(Easing.quad) }),
     );
 
-    const timer = setTimeout(() => {
-      router.replace('/(auth)/welcome');
-    }, 2800);
+    let isMounted = true;
 
-    return () => clearTimeout(timer);
+    const checkSessionAndNavigate = async () => {
+      const token = await getAccessToken();
+      const user = await getStoredUser();
+
+      // Give animation a moment to display
+      await new Promise((resolve) => setTimeout(resolve, 2200));
+
+      if (!isMounted) return;
+
+      if (token && user) {
+        // Session exists -> attempt optional token refresh to ensure validity
+        const refreshed = await refreshTokens();
+        if (refreshed || token) {
+          router.replace('/(tabs)');
+          return;
+        }
+      }
+
+      router.replace('/(auth)/welcome');
+    };
+
+    checkSessionAndNavigate();
+
+    return () => {
+      isMounted = false;
+    };
   }, [logoOpacity, logoScale, progressWidth, router]);
 
   const logoStyle = useAnimatedStyle(() => ({

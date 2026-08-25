@@ -46,5 +46,24 @@ To learn more about developing your project with Expo, look at the following res
 
 Join our community of developers creating universal apps.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Backend Integration
+
+HydroLink frontend connects to the HydroLink Node.js/Express backend API.
+
+### Endpoints Configuration
+- **Production API URL (Default)**: `https://hydrolink-backend.onrender.com/api/v1`
+- **Local Development**: `http://localhost:4000/api/v1`
+- **Android Emulator**: `http://10.0.2.2:4000/api/v1`
+
+You can customize `API_BASE_URL` inside `services/api.ts` to switch environments.
+
+### Seed Login Credentials
+Use the pre-seeded account to test real backend data integration:
+- **Email**: `abebe.bikila@example.com`
+- **Password**: `Password123!`
+
+### Note on Schedule API (`/schedule/*`)
+The backend schedule endpoints require the authenticated user to have a `kebele` specified on their profile (e.g. `"Kebele 01"`). If `kebele` is omitted, schedule queries will return a message instructing the user to set their kebele. You can update your user profile via `PUT /users/me` with `{ "kebele": "Kebele 01" }`.
+

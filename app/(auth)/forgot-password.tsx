@@ -12,6 +12,8 @@ import {
 } from '@/components/auth';
 import { HydroColors, HydroSpacing, HydroTypography } from '@/constants/auth-theme';
 import { forgotPasswordSchema, validateForm, type ForgotPasswordFormData } from '@/utils/validation';
+import { forgotPassword } from '@/services/auth';
+import { ApiError } from '@/services/api';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -38,13 +40,23 @@ export default function ForgotPasswordScreen() {
     }
 
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setLoading(false);
-
-    router.push({
-      pathname: '/(auth)/otp-verification',
-      params: { email: form.email, flow: 'reset' },
-    });
+    try {
+      await forgotPassword(form.email);
+      router.push({
+        pathname: '/(auth)/otp-verification',
+        params: { email: form.email, flow: 'reset' },
+      });
+    } catch (err) {
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Could not send verification code.';
+      setErrors({ email: message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
