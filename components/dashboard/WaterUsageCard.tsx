@@ -3,12 +3,19 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardTheme } from './ThemeContext';
 import { DashboardLayout, DashboardShadows } from '@/constants/dashboard-theme';
+import type { UsageSummary } from '@/services/usage';
 
-export function WaterUsageCard() {
+type WaterUsageProps = {
+  usage?: UsageSummary | null;
+};
+
+export function WaterUsageCard({ usage }: WaterUsageProps) {
   const { colors } = useDashboardTheme();
 
-  // Data points for past 6 months (Feb to Jul)
-  const monthlyData = [
+  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Fallback static data points for past 5 months
+  const defaultMonthlyData = [
     { month: 'Mar', val: 24, label: '24 m³' },
     { month: 'Apr', val: 26, label: '26 m³' },
     { month: 'May', val: 30, label: '30 m³' },
@@ -16,7 +23,19 @@ export function WaterUsageCard() {
     { month: 'Jul', val: 32, label: '32 m³', active: true },
   ];
 
-  const maxVal = 40;
+  const mappedData = (usage?.last12Months ?? [])
+    .slice(0, 5)
+    .reverse()
+    .map((r, i, arr) => ({
+      month: MONTHS_SHORT[(r.periodMonth - 1) % 12],
+      val: Math.round(r.usageM3),
+      label: `${Math.round(r.usageM3)} m³`,
+      active: i === arr.length - 1,
+    }));
+
+  const monthlyData = mappedData.length > 0 ? mappedData : defaultMonthlyData;
+  const currentVal = usage?.latest?.usageM3 ? Math.round(usage.latest.usageM3) : 32;
+  const maxVal = Math.max(...monthlyData.map((d) => d.val), 40);
 
   return (
     <View style={styles.container}>
@@ -34,7 +53,7 @@ export function WaterUsageCard() {
           <View>
             <Text style={[styles.label, { color: colors.textMuted }]}>Current Month Usage</Text>
             <View style={styles.valueRow}>
-              <Text style={[styles.mainValue, { color: colors.textPrimary }]}>32</Text>
+              <Text style={[styles.mainValue, { color: colors.textPrimary }]}>{currentVal}</Text>
               <Text style={[styles.unit, { color: colors.primary }]}>m³</Text>
             </View>
           </View>

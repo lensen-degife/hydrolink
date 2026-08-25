@@ -3,6 +3,8 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardTheme } from './ThemeContext';
 import { DashboardLayout, DashboardShadows } from '@/constants/dashboard-theme';
+import type { Announcement } from '@/services/announcements';
+import { formatDate } from '@/utils/format';
 
 export type NewsItem = {
   id: string;
@@ -15,13 +17,14 @@ export type NewsItem = {
 };
 
 type NewsSectionProps = {
+  announcements?: Announcement[] | null;
   onSelectNews?: (item: NewsItem) => void;
 };
 
-export function CommunityNewsSection({ onSelectNews }: NewsSectionProps) {
+export function CommunityNewsSection({ announcements, onSelectNews }: NewsSectionProps) {
   const { colors } = useDashboardTheme();
 
-  const newsData: NewsItem[] = [
+  const defaultNewsData: NewsItem[] = [
     {
       id: 'news_1',
       category: 'Water Maintenance',
@@ -59,6 +62,18 @@ export function CommunityNewsSection({ onSelectNews }: NewsSectionProps) {
       badgeText: colors.onWarningContainer,
     },
   ];
+
+  const mappedNews: NewsItem[] = (announcements ?? []).map((a) => ({
+    id: a.id,
+    category: 'Public Notice',
+    title: a.title,
+    description: a.body,
+    date: formatDate(a.createdAt),
+    badgeBg: colors.primaryContainer,
+    badgeText: colors.primary,
+  }));
+
+  const newsData: NewsItem[] = mappedNews.length > 0 ? mappedNews : defaultNewsData;
 
   const renderCard = ({ item }: { item: NewsItem }) => (
     <Pressable

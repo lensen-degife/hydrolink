@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   CommunityNewsSection,
@@ -21,6 +21,8 @@ import {
 } from '@/components/dashboard';
 import { AnimatedScreen } from '@/components/auth';
 import { useRouter } from 'expo-router';
+import { useDashboardData } from '@/hooks/useDashboardData';
+import { greetingForNow, formatEtb, formatDate, supplyStatusLabel } from '@/utils/format';
 
 type ActiveModalState =
   | { type: 'pay_bill' }
@@ -37,6 +39,16 @@ export default function HomeScreen() {
   const { colors } = useDashboardTheme();
   const router = useRouter();
   const [activeModal, setActiveModal] = useState<ActiveModalState>(null);
+  const { data, loading, error, refresh } = useDashboardData();
+
+  const unread = data.notifications.filter((n) => !n.isRead).length;
+  const activeRequests = data.requests.filter(
+    (r) => r.status === 'OPEN' || r.status === 'IN_PROGRESS',
+  ).length;
+
+  const billAmount = data.bill ? `${formatEtb(data.bill.amountEtb)} ETB` : '450 ETB';
+  const billDue = data.bill ? `Due ${formatDate(data.bill.dueDate)}` : 'Due Aug 10';
+  const waterLabelStr = data.waterStatus ? supplyStatusLabel(data.waterStatus.status) : 'Available';
 
   // Handle Quick Action clicks
   const handleQuickAction = (actionId: string) => {
@@ -98,21 +110,41 @@ export default function HomeScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={refresh} tintColor={colors.primary} />
+          }
         >
+          {error ? (
+            <Text style={{ color: colors.error, paddingHorizontal: 16, paddingTop: 12, textAlign: 'center', fontSize: 13 }}>
+              {error}
+            </Text>
+          ) : null}
+
           {/* Top App Bar */}
           <TopAppBar
+            greeting={greetingForNow()}
+            userName={data.user?.fullName}
+            accountNumber={data.user?.accountNumber}
+            kebele={data.user?.kebele ?? undefined}
             onPressNotifications={() => setActiveModal({ type: 'notifications' })}
             onPressProfile={() => setActiveModal({ type: 'profile' })}
-            unreadCount={3}
+            unreadCount={unread || 3}
           />
 
           {/* Hero Card (Community Status) */}
           <HeroStatusCard
+            waterStatus={data.waterStatus}
+            nextSlot={data.todaySlots[0] ?? null}
             onPressSchedule={() => setActiveModal({ type: 'schedule' })}
           />
 
           {/* Today's Summary Grid */}
           <TodaySummaryGrid
+            waterLabel={waterLabelStr}
+            billLabel={billAmount}
+            billSubtitle={billDue}
+            announcementsCount={data.announcements.length || 3}
+            activeReportsCount={activeRequests || 1}
             onPressCard={(type) => {
               if (type === 'pending_bill') setActiveModal({ type: 'pay_bill' });
               else if (type === 'active_reports') setActiveModal({ type: 'report_issue' });
@@ -139,25 +171,31 @@ export default function HomeScreen() {
 
           {/* Current Bill Card */}
           <CurrentBillCard
+            bill={data.bill}
+            loading={loading}
             onPayNow={() => setActiveModal({ type: 'pay_bill' })}
             onViewDetails={() => setActiveModal({ type: 'pay_bill' })}
           />
 
           {/* Today's Water Schedule Timeline Card */}
           <WaterScheduleCard
+            slots={data.todaySlots}
+            waterStatus={data.waterStatus}
             onViewWeeklySchedule={() => setActiveModal({ type: 'schedule' })}
           />
 
           {/* Latest Community News Horizontal List */}
           <CommunityNewsSection
+            announcements={data.announcements}
             onSelectNews={(item) => setActiveModal({ type: 'news', item })}
           />
 
           {/* Water Usage Analytics Card */}
-          <WaterUsageCard />
+          <WaterUsageCard usage={data.usage} />
 
           {/* Recent Payments Transaction Card */}
           <RecentPaymentsCard
+            payments={data.payments}
             onViewAll={() =>
               setActiveModal({
                 type: 'receipt',
@@ -178,6 +216,7 @@ export default function HomeScreen() {
 
           {/* Service Requests Tracker Card */}
           <ServiceRequestsCard
+            requests={data.requests}
             onPressRequestDetails={() => setActiveModal({ type: 'report_issue' })}
           />
 

@@ -3,13 +3,27 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardTheme } from './ThemeContext';
 import { DashboardLayout, DashboardShadows } from '@/constants/dashboard-theme';
+import type { ScheduleSlot, WaterStatus } from '@/services/schedule';
+import { supplyStatusLabel, formatTime12 } from '@/utils/format';
 
 type WaterScheduleCardProps = {
+  slots?: ScheduleSlot[];
+  waterStatus?: WaterStatus | null;
   onViewWeeklySchedule?: () => void;
 };
 
-export function WaterScheduleCard({ onViewWeeklySchedule }: WaterScheduleCardProps) {
+export function WaterScheduleCard({ slots, waterStatus, onViewWeeklySchedule }: WaterScheduleCardProps) {
   const { colors } = useDashboardTheme();
+
+  const activeSlot = slots?.[0];
+  const nextSlot = slots?.[1];
+  const areaName = waterStatus?.kebele ?? activeSlot?.kebele ?? 'Kebele 01';
+  const statusLabelText = waterStatus ? supplyStatusLabel(waterStatus.status) : 'Available';
+  const startTimeText = activeSlot ? formatTime12(activeSlot.startTime) : '08:00 AM';
+  const endTimeText = activeSlot ? formatTime12(activeSlot.endTime) : '01:00 PM';
+  const footnoteText = nextSlot
+    ? `Next Zone: ${nextSlot.kebele} scheduled at ${formatTime12(nextSlot.startTime)}`
+    : 'Next Zone: Kebele 02 scheduled at 02:00 PM';
 
   return (
     <View style={styles.container}>
@@ -34,14 +48,14 @@ export function WaterScheduleCard({ onViewWeeklySchedule }: WaterScheduleCardPro
                 Today's Distribution
               </Text>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                Area: Kebele 01
+                Area: {areaName}
               </Text>
             </View>
           </View>
 
           <View style={[styles.statusBadge, { backgroundColor: colors.successContainer }]}>
             <View style={[styles.dot, { backgroundColor: colors.success }]} />
-            <Text style={[styles.statusText, { color: colors.onSuccessContainer }]}>Available</Text>
+            <Text style={[styles.statusText, { color: colors.onSuccessContainer }]}>{statusLabelText}</Text>
           </View>
         </View>
 
@@ -54,7 +68,7 @@ export function WaterScheduleCard({ onViewWeeklySchedule }: WaterScheduleCardPro
                 <View style={[styles.innerDot, { backgroundColor: colors.primary }]} />
               </View>
               <Text style={[styles.timeLabel, { color: colors.textMuted }]}>Start</Text>
-              <Text style={[styles.timeValue, { color: colors.textPrimary }]}>08:00 AM</Text>
+              <Text style={[styles.timeValue, { color: colors.textPrimary }]}>{startTimeText}</Text>
             </View>
 
             {/* Connecting Track Line */}
@@ -72,7 +86,7 @@ export function WaterScheduleCard({ onViewWeeklySchedule }: WaterScheduleCardPro
                 <View style={[styles.innerDot, { backgroundColor: colors.secondary }]} />
               </View>
               <Text style={[styles.timeLabel, { color: colors.textMuted }]}>End</Text>
-              <Text style={[styles.timeValue, { color: colors.textPrimary }]}>01:00 PM</Text>
+              <Text style={[styles.timeValue, { color: colors.textPrimary }]}>{endTimeText}</Text>
             </View>
           </View>
         </View>
@@ -81,7 +95,7 @@ export function WaterScheduleCard({ onViewWeeklySchedule }: WaterScheduleCardPro
         <View style={[styles.footerBanner, { backgroundColor: colors.surfaceVariant }]}>
           <Ionicons name="location" size={14} color={colors.primary} />
           <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-            Next Zone: Kebele 02 scheduled at 02:00 PM
+            {footnoteText}
           </Text>
         </View>
 

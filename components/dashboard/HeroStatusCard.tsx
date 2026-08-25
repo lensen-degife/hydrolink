@@ -6,12 +6,23 @@ import { AnimatedWaterWave } from './AnimatedWaterWave';
 import { DashboardLayout, DashboardShadows } from '@/constants/dashboard-theme';
 import { useDashboardTheme } from './ThemeContext';
 
+import type { ScheduleSlot, WaterStatus } from '@/services/schedule';
+import { supplyStatusLabel, formatTime12 } from '@/utils/format';
+
 type HeroStatusCardProps = {
+  waterStatus?: WaterStatus | null;
+  nextSlot?: ScheduleSlot | null;
   onPressSchedule?: () => void;
 };
 
-export function HeroStatusCard({ onPressSchedule }: HeroStatusCardProps) {
+export function HeroStatusCard({ waterStatus, nextSlot, onPressSchedule }: HeroStatusCardProps) {
   const { isDark } = useDashboardTheme();
+
+  const statusLabel = waterStatus ? supplyStatusLabel(waterStatus.status) : 'Water Available';
+  const kebeleLabel = waterStatus?.kebele ?? 'Kebele 01';
+  const nextDistLabel = nextSlot
+    ? `${formatTime12(nextSlot.startTime)} - ${formatTime12(nextSlot.endTime)}`
+    : 'Tomorrow • 08:00 AM';
 
   // Vibrant water-themed gradient colors
   const gradientColors = isDark
@@ -35,11 +46,11 @@ export function HeroStatusCard({ onPressSchedule }: HeroStatusCardProps) {
             <View style={styles.dropBadge}>
               <MaterialCommunityIcons name="water" size={20} color="#FFFFFF" />
             </View>
-            <Text style={styles.cardTitle}>Community Status</Text>
+            <Text style={styles.cardTitle}>{waterStatus?.kebele ? `${waterStatus.kebele} Status` : 'Community Status'}</Text>
           </View>
           <View style={styles.statusPill}>
             <View style={styles.greenDot} />
-            <Text style={styles.statusText}>Water Available</Text>
+            <Text style={styles.statusText}>{statusLabel}</Text>
           </View>
         </View>
 
@@ -61,7 +72,7 @@ export function HeroStatusCard({ onPressSchedule }: HeroStatusCardProps) {
             <Text style={styles.detailLabel}>Service Area</Text>
             <View style={styles.valueRow}>
               <Ionicons name="location-outline" size={15} color="#90CAF9" />
-              <Text style={styles.detailValue}>Kebele 01</Text>
+              <Text style={styles.detailValue}>{kebeleLabel}</Text>
             </View>
           </View>
 
@@ -90,7 +101,7 @@ export function HeroStatusCard({ onPressSchedule }: HeroStatusCardProps) {
             <Ionicons name="calendar-outline" size={18} color="#E3F2FD" />
             <View style={{ marginLeft: 8 }}>
               <Text style={styles.distLabel}>Next Distribution</Text>
-              <Text style={styles.distValue}>Tomorrow • 08:00 AM</Text>
+              <Text style={styles.distValue}>{nextDistLabel}</Text>
             </View>
           </View>
           <View style={styles.activeTag}>

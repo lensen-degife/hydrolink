@@ -5,12 +5,20 @@ import { useDashboardTheme } from './ThemeContext';
 import { DashboardLayout } from '@/constants/dashboard-theme';
 
 type TopAppBarProps = {
+  greeting?: string;
+  userName?: string;
+  accountNumber?: string;
+  kebele?: string;
   onPressNotifications?: () => void;
   onPressProfile?: () => void;
   unreadCount?: number;
 };
 
 export function TopAppBar({
+  greeting = 'Good Morning 👋',
+  userName = 'Abebe Bikila',
+  accountNumber = 'HL-884920',
+  kebele = 'Boreda Woreda',
   onPressNotifications,
   onPressProfile,
   unreadCount = 3,
@@ -22,18 +30,18 @@ export function TopAppBar({
       <View style={styles.leftColumn}>
         <View style={styles.greetingRow}>
           <Text style={[styles.greetingText, { color: colors.textSecondary }]}>
-            Good Morning 👋
+            {greeting}
           </Text>
         </View>
-        <Text style={[styles.nameText, { color: colors.textPrimary }]}>Abebe Bikila</Text>
+        <Text style={[styles.nameText, { color: colors.textPrimary }]}>{userName}</Text>
         <View style={styles.metaRow}>
           <Text style={[styles.idText, { color: colors.primary, backgroundColor: colors.primaryContainer }]}>
-            ID: HL-884920
+            ID: {accountNumber}
           </Text>
           <View style={[styles.locationChip, { backgroundColor: colors.surfaceVariant }]}>
             <Ionicons name="location-sharp" size={13} color="#1976D2" />
             <Text style={[styles.locationText, { color: colors.textSecondary }]}>
-              Boreda Woreda
+              {kebele}
             </Text>
           </View>
         </View>

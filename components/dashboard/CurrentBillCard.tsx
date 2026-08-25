@@ -3,14 +3,25 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardTheme } from './ThemeContext';
 import { DashboardLayout, DashboardShadows } from '@/constants/dashboard-theme';
+import type { Bill } from '@/services/bills';
+import { formatEtb, formatDate, formatMonthYear, billStatusLabel } from '@/utils/format';
 
 type CurrentBillCardProps = {
+  bill?: Bill | null;
+  loading?: boolean;
   onPayNow?: () => void;
   onViewDetails?: () => void;
 };
 
-export function CurrentBillCard({ onPayNow, onViewDetails }: CurrentBillCardProps) {
+export function CurrentBillCard({ bill, loading, onPayNow, onViewDetails }: CurrentBillCardProps) {
   const { colors } = useDashboardTheme();
+
+  const amountText = bill ? formatEtb(bill.amountEtb) : '450';
+  const dueDateText = bill ? formatDate(bill.dueDate) : '10 August 2026';
+  const statusLabelText = bill ? billStatusLabel(bill.status) : 'Pending';
+  const infoTextStr = bill
+    ? `Billing Period: ${formatMonthYear(bill.periodMonth, bill.periodYear)} • Consumption: ${bill.usageM3} m³`
+    : 'Billing Period: July 01 - July 31, 2026 • Meter ID: #MTR-9021';
 
   return (
     <View style={styles.container}>
@@ -19,7 +30,7 @@ export function CurrentBillCard({ onPayNow, onViewDetails }: CurrentBillCardProp
 
         <View style={[styles.statusBadge, { backgroundColor: colors.warningContainer }]}>
           <View style={[styles.statusDot, { backgroundColor: colors.warning }]} />
-          <Text style={[styles.statusText, { color: colors.onWarningContainer }]}>Pending</Text>
+          <Text style={[styles.statusText, { color: colors.onWarningContainer }]}>{statusLabelText}</Text>
         </View>
       </View>
 
@@ -34,7 +45,7 @@ export function CurrentBillCard({ onPayNow, onViewDetails }: CurrentBillCardProp
           <View style={styles.amountContainer}>
             <Text style={[styles.billLabel, { color: colors.textMuted }]}>Amount Due</Text>
             <View style={styles.currencyRow}>
-              <Text style={[styles.amountText, { color: colors.textPrimary }]}>450</Text>
+              <Text style={[styles.amountText, { color: colors.textPrimary }]}>{amountText}</Text>
               <Text style={[styles.currencyText, { color: colors.primary }]}>ETB</Text>
             </View>
           </View>
@@ -44,14 +55,14 @@ export function CurrentBillCard({ onPayNow, onViewDetails }: CurrentBillCardProp
               <Ionicons name="calendar-outline" size={15} color={colors.textMuted} />
               <Text style={[styles.dueLabel, { color: colors.textMuted }]}>Due Date</Text>
             </View>
-            <Text style={[styles.dueDateText, { color: colors.textPrimary }]}>10 August 2026</Text>
+            <Text style={[styles.dueDateText, { color: colors.textPrimary }]}>{dueDateText}</Text>
           </View>
         </View>
 
         <View style={[styles.infoRow, { backgroundColor: colors.surfaceVariant }]}>
           <Ionicons name="information-circle-outline" size={16} color={colors.primary} />
           <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            Billing Period: July 01 - July 31, 2026 • Meter ID: #MTR-9021
+            {infoTextStr}
           </Text>
         </View>
 

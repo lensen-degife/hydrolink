@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardTheme } from './ThemeContext';
 import { DashboardLayout, DashboardShadows } from '@/constants/dashboard-theme';
+import type { Payment } from '@/services/payments';
+import { formatEtb, formatDate, formatMonthYear, paymentMethodLabel, paymentStatusLabel } from '@/utils/format';
 
 export type PaymentTransaction = {
   id: string;
@@ -14,14 +16,15 @@ export type PaymentTransaction = {
 };
 
 type RecentPaymentsProps = {
+  payments?: Payment[] | null;
   onViewAll?: () => void;
   onSelectReceipt?: (item: PaymentTransaction) => void;
 };
 
-export function RecentPaymentsCard({ onViewAll, onSelectReceipt }: RecentPaymentsProps) {
+export function RecentPaymentsCard({ payments, onViewAll, onSelectReceipt }: RecentPaymentsProps) {
   const { colors } = useDashboardTheme();
 
-  const transactions: PaymentTransaction[] = [
+  const defaultTransactions: PaymentTransaction[] = [
     {
       id: 'tx_1',
       month: 'July 2026',
@@ -47,6 +50,17 @@ export function RecentPaymentsCard({ onViewAll, onSelectReceipt }: RecentPayment
       date: '08 May 2026',
     },
   ];
+
+  const mappedTx: PaymentTransaction[] = (payments ?? []).slice(0, 5).map((p) => ({
+    id: p.id,
+    month: p.bill ? formatMonthYear(p.bill.periodMonth, p.bill.periodYear) : formatDate(p.createdAt),
+    amount: `${formatEtb(p.amountEtb)} ETB`,
+    method: paymentMethodLabel(p.method),
+    status: paymentStatusLabel(p.status),
+    date: formatDate(p.paidAt ?? p.createdAt),
+  }));
+
+  const transactions: PaymentTransaction[] = mappedTx.length > 0 ? mappedTx : defaultTransactions;
 
   return (
     <View style={styles.container}>

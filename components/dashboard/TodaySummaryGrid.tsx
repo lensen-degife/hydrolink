@@ -5,17 +5,29 @@ import { useDashboardTheme } from './ThemeContext';
 import { DashboardLayout, DashboardShadows } from '@/constants/dashboard-theme';
 
 type SummaryGridProps = {
+  waterLabel?: string;
+  billLabel?: string;
+  billSubtitle?: string;
+  announcementsCount?: number;
+  activeReportsCount?: number;
   onPressCard?: (type: string) => void;
 };
 
-export function TodaySummaryGrid({ onPressCard }: SummaryGridProps) {
+export function TodaySummaryGrid({
+  waterLabel = 'Available',
+  billLabel = '450 ETB',
+  billSubtitle = 'Due Aug 10',
+  announcementsCount = 3,
+  activeReportsCount = 1,
+  onPressCard,
+}: SummaryGridProps) {
   const { colors } = useDashboardTheme();
 
   const summaryItems = [
     {
       id: 'water_status',
       title: 'Water Status',
-      value: 'Available',
+      value: waterLabel,
       subtitle: 'Normal Supply',
       icon: (color: string) => <MaterialCommunityIcons name="water-check" size={24} color={color} />,
       badgeColor: colors.success,
@@ -25,8 +37,8 @@ export function TodaySummaryGrid({ onPressCard }: SummaryGridProps) {
     {
       id: 'pending_bill',
       title: 'Pending Bill',
-      value: '450 ETB',
-      subtitle: 'Due Aug 10',
+      value: billLabel,
+      subtitle: billSubtitle,
       icon: (color: string) => <Ionicons name="card-outline" size={24} color={color} />,
       badgeColor: colors.warning,
       badgeBg: colors.warningContainer,
@@ -35,7 +47,7 @@ export function TodaySummaryGrid({ onPressCard }: SummaryGridProps) {
     {
       id: 'announcements',
       title: 'Announcements',
-      value: '3 New',
+      value: `${announcementsCount} New`,
       subtitle: 'Community News',
       icon: (color: string) => <Ionicons name="megaphone-outline" size={24} color={color} />,
       badgeColor: colors.primary,
@@ -45,7 +57,7 @@ export function TodaySummaryGrid({ onPressCard }: SummaryGridProps) {
     {
       id: 'active_reports',
       title: 'Active Reports',
-      value: '1 Active',
+      value: `${activeReportsCount} Active`,
       subtitle: 'Leak Ticket',
       icon: (color: string) => <Ionicons name="alert-circle-outline" size={24} color={color} />,
       badgeColor: colors.error,

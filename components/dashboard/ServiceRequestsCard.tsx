@@ -3,20 +3,33 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardTheme } from './ThemeContext';
 import { DashboardLayout, DashboardShadows } from '@/constants/dashboard-theme';
+import type { ServiceRequest } from '@/services/requests';
+import { requestTypeLabel, requestStatusLabel } from '@/utils/format';
 
 type ServiceRequestsProps = {
+  requests?: ServiceRequest[] | null;
   onPressRequestDetails?: () => void;
 };
 
-export function ServiceRequestsCard({ onPressRequestDetails }: ServiceRequestsProps) {
+export function ServiceRequestsCard({ requests, onPressRequestDetails }: ServiceRequestsProps) {
   const { colors } = useDashboardTheme();
+
+  const activeReqs = (requests ?? []).filter(
+    (r) => r.status === 'OPEN' || r.status === 'IN_PROGRESS',
+  );
+  const activeCountText = requests ? `${activeReqs.length} Active` : '1 Active';
+  const primaryReq = activeReqs[0] ?? requests?.[0];
+
+  const titleText = primaryReq ? requestTypeLabel(primaryReq.type) : 'Leak Report';
+  const ticketIdText = primaryReq ? `Ticket #${primaryReq.id.slice(-6).toUpperCase()}` : 'Ticket #REQ-4092';
+  const statusTextStr = primaryReq ? requestStatusLabel(primaryReq.status) : 'In Progress';
 
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Service Requests</Text>
         <View style={[styles.activeCountBadge, { backgroundColor: colors.primaryContainer }]}>
-          <Text style={[styles.activeCountText, { color: colors.primary }]}>1 Active</Text>
+          <Text style={[styles.activeCountText, { color: colors.primary }]}>{activeCountText}</Text>
         </View>
       </View>
 
@@ -33,14 +46,14 @@ export function ServiceRequestsCard({ onPressRequestDetails }: ServiceRequestsPr
               <Ionicons name="construct-outline" size={20} color={colors.warning} />
             </View>
             <View>
-              <Text style={[styles.requestTitle, { color: colors.textPrimary }]}>Leak Report</Text>
-              <Text style={[styles.ticketId, { color: colors.textMuted }]}>Ticket #REQ-4092</Text>
+              <Text style={[styles.requestTitle, { color: colors.textPrimary }]}>{titleText}</Text>
+              <Text style={[styles.ticketId, { color: colors.textMuted }]}>{ticketIdText}</Text>
             </View>
           </View>
 
           <View style={[styles.statusPill, { backgroundColor: colors.warningContainer }]}>
             <View style={[styles.statusDot, { backgroundColor: colors.warning }]} />
-            <Text style={[styles.statusText, { color: colors.onWarningContainer }]}>In Progress</Text>
+            <Text style={[styles.statusText, { color: colors.onWarningContainer }]}>{statusTextStr}</Text>
           </View>
         </View>
 
