@@ -19,7 +19,6 @@ type AuthLayoutProps = {
   showGradient?: boolean;
   scrollable?: boolean;
 };
-
 export function AuthLayout({
   children,
   header,
@@ -29,6 +28,8 @@ export function AuthLayout({
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   const isCompact = height < 700;
+  // Adaptive gradient height so it doesn't eat too much space on short screens
+  const gradientHeight = isCompact ? 140 : 180;
 
   const content = (
     <View
@@ -36,7 +37,7 @@ export function AuthLayout({
         styles.content,
         showGradient && styles.contentWithGradient,
         !showGradient && { paddingTop: insets.top + 16 },
-        { paddingBottom: insets.bottom + 24 },
+        { paddingBottom: Math.max(insets.bottom, 16) + 16 },
       ]}>
       {header}
       <View style={[styles.formCard, isCompact && styles.formCardCompact]}>{children}</View>
@@ -50,7 +51,13 @@ export function AuthLayout({
           colors={[HydroColors.gradientStart, HydroColors.gradientMid, HydroColors.gradientEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={[styles.gradientHeader, { paddingTop: insets.top + 16 }]}>
+          style={[
+            styles.gradientHeader,
+            {
+              height: gradientHeight + insets.top,
+              paddingTop: insets.top + 12,
+            },
+          ]}>
           {header ? null : <View style={styles.gradientSpacer} />}
           <WaveDecoration />
         </LinearGradient>
@@ -58,13 +65,14 @@ export function AuthLayout({
 
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
         {scrollable ? (
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}>
+            showsVerticalScrollIndicator={false}
+            bounces={true}>
             {content}
           </ScrollView>
         ) : (
@@ -74,7 +82,6 @@ export function AuthLayout({
     </View>
   );
 }
-
 export function AuthScreenContainer({
   children,
   centered = false,
@@ -105,7 +112,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   gradientHeader: {
-    height: 200,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -116,11 +122,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: 20,
   },
   contentWithGradient: {
-    marginTop: -40,
+    marginTop: -36,
   },
   formCard: {
     backgroundColor: HydroColors.surface,
@@ -135,7 +141,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0,87,168,0.06)',
   },
   formCardCompact: {
-    padding: 20,
+    padding: 18,
   },
   screenContainer: {
     flex: 1,

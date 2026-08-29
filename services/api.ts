@@ -1,6 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 
-const API_BASE_URL = 'https://hydrolink-backend.onrender.com/api/v1';
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ??
+  'https://hydrolink-backend.onrender.com/api/v1';
 const ACCESS_TOKEN_KEY = 'hydrolink_access_token';
 const REFRESH_TOKEN_KEY = 'hydrolink_refresh_token';
 const USER_KEY = 'hydrolink_user';

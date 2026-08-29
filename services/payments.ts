@@ -11,13 +11,18 @@ export type Payment = {
   status: PaymentStatus;
   paidAt: string | null;
   createdAt: string;
+  transactionRef?: string | null;
   bill?: { periodMonth: number; periodYear: number };
 };
 
 export const createPayment = (billId: string, amount: string | number, method: PaymentMethod | string) =>
   apiRequest<Payment>('/payments', {
     method: 'POST',
-    body: { billId, amount, method },
+    body: {
+      billId,
+      amount: typeof amount === 'string' ? parseFloat(amount) : amount,
+      method: method.toLowerCase(),
+    },
   });
 
 export const getPaymentHistory = () => apiRequest<Payment[]>('/payments/history');

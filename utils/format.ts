@@ -97,3 +97,27 @@ export function requestStatusLabel(status: string | null | undefined): string {
     default: return status || 'Open';
   }
 }
+
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+export function dayOfWeekLabel(dayOfWeek: number, markToday = false): string {
+  const name = DAY_NAMES[dayOfWeek] ?? `Day ${dayOfWeek}`;
+  if (markToday && dayOfWeek === new Date().getDay()) {
+    return `${name} (Today)`;
+  }
+  return name;
+}
+
+export function formatRelativeTime(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const diffMs = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(diffMs)) return '—';
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'} ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return days === 1 ? 'Yesterday' : `${days} days ago`;
+  return formatDate(iso);
+}

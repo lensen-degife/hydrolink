@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
 import {
   AnimatedScreen,
@@ -12,7 +12,7 @@ import {
   AuthTextInput,
   HydroLogoCompact,
 } from '@/components/auth';
-import { HydroColors, HydroSpacing, HydroTypography } from '@/constants/auth-theme';
+import {  HydroSpacing } from '@/constants/auth-theme';
 import { loginSchema, validateForm, type LoginFormData } from '@/utils/validation';
 import { login as loginApi } from '@/services/auth';
 import { ApiError } from '@/services/api';
@@ -118,10 +118,6 @@ export default function LoginScreen() {
           linkText="Create one"
           onPress={() => router.push('/(auth)/register')}
         />
-
-        <View style={styles.securityNote}>
-          <Text style={styles.securityText}>🔒 Secured with 256-bit encryption</Text>
-        </View>
       </AnimatedScreen>
     </AuthLayout>
   );
@@ -137,13 +133,5 @@ const styles = StyleSheet.create({
     height: 36,
     marginTop: -8,
     marginBottom: 8,
-  },
-  securityNote: {
-    alignItems: 'center',
-    marginTop: HydroSpacing.md,
-  },
-  securityText: {
-    ...HydroTypography.labelMedium,
-    color: HydroColors.onSurfaceVariant,
-  },
+  }
 });

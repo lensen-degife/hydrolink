@@ -3,6 +3,7 @@ import { getCurrentBill, type Bill } from '@/services/bills';
 import { getPaymentHistory, type Payment } from '@/services/payments';
 import {
   getTodaySchedule,
+  getWeeklySchedule,
   getWaterStatus,
   type ScheduleSlot,
   type WaterStatus,
@@ -19,6 +20,7 @@ export type DashboardData = {
   bill: Bill | null;
   payments: Payment[];
   todaySlots: ScheduleSlot[];
+  weeklySchedule: ScheduleSlot[];
   waterStatus: WaterStatus | null;
   usage: UsageSummary | null;
   requests: ServiceRequest[];
@@ -31,6 +33,7 @@ const emptyData: DashboardData = {
   bill: null,
   payments: [],
   todaySlots: [],
+  weeklySchedule: [],
   waterStatus: null,
   usage: null,
   requests: [],
@@ -52,6 +55,7 @@ export function useDashboardData() {
         getCurrentBill(),
         getPaymentHistory(),
         getTodaySchedule(),
+        getWeeklySchedule(),
         getWaterStatus(),
         getUsageSummary(),
         myRequests(),
@@ -69,11 +73,12 @@ export function useDashboardData() {
         bill: val(1, null),
         payments: val(2, []),
         todaySlots: val(3, []),
-        waterStatus: val(4, null),
-        usage: val(5, null),
-        requests: val(6, []),
-        announcements: val(7, []),
-        notifications: val(8, []),
+        weeklySchedule: val(4, []),
+        waterStatus: val(5, null),
+        usage: val(6, null),
+        requests: val(7, []),
+        announcements: val(8, []),
+        notifications: val(9, []),
       });
 
       const failed = results.filter((r) => r.status === 'rejected');
