@@ -44,6 +44,19 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "apiUrl": "https://hydrolink-backend.onrender.com/api/v1",
+      "router": {},
+      "eas": {
+        "projectId": "1a7d5489-6ee6-4f4a-b496-210072596120"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1a7d5489-6ee6-4f4a-b496-210072596120"
     }
   }
 }
