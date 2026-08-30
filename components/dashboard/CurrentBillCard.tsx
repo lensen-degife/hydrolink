@@ -16,12 +16,23 @@ type CurrentBillCardProps = {
 export function CurrentBillCard({ bill, loading, onPayNow, onViewDetails }: CurrentBillCardProps) {
   const { colors } = useDashboardTheme();
 
-  const amountText = bill ? formatEtb(bill.amountEtb) : '450';
-  const dueDateText = bill ? formatDate(bill.dueDate) : '10 August 2026';
-  const statusLabelText = bill ? billStatusLabel(bill.status) : 'Pending';
+  const isBackendEmpty = bill === null;
+  const amountText = bill ? formatEtb(bill.amountEtb) : loading ? '...' : isBackendEmpty ? '0' : '450';
+  const dueDateText = bill
+    ? formatDate(bill.dueDate)
+    : loading
+      ? 'Loading...'
+      : isBackendEmpty
+        ? 'No active bill'
+        : '10 August 2026';
+  const statusLabelText = bill ? billStatusLabel(bill.status) : loading ? 'Loading' : isBackendEmpty ? 'None' : 'Pending';
   const infoTextStr = bill
     ? `Billing Period: ${formatMonthYear(bill.periodMonth, bill.periodYear)} • Consumption: ${bill.usageM3} m³`
-    : 'Billing Period: July 01 - July 31, 2026 • Meter ID: #MTR-9021';
+    : loading
+      ? 'Loading current bill from your account...'
+      : isBackendEmpty
+        ? 'No current bill was returned for this account.'
+        : 'Billing Period: July 01 - July 31, 2026 • Meter ID: #MTR-9021';
 
   return (
     <View style={styles.container}>

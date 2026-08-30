@@ -68,7 +68,7 @@ export function TodaySummaryGrid({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Today's Summary</Text>
+      <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{"Today's Summary"}</Text>
 
       <View style={styles.grid}>
         {summaryItems.map((item) => (

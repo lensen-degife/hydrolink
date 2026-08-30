@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   CommunityNewsSection,
@@ -21,7 +21,7 @@ import {
 } from '@/components/dashboard';
 import { AnimatedScreen } from '@/components/auth';
 import { useRouter } from 'expo-router';
-import { useDashboardData } from '@/hooks/useDashboardData';
+import { useDashboard } from '@/contexts/DashboardDataContext';
 import { greetingForNow, formatEtb, formatDate, supplyStatusLabel } from '@/utils/format';
 
 type ActiveModalState =
@@ -39,7 +39,7 @@ export default function HomeScreen() {
   const { colors } = useDashboardTheme();
   const router = useRouter();
   const [activeModal, setActiveModal] = useState<ActiveModalState>(null);
-  const { data, loading, error, refresh } = useDashboardData();
+  const { data, loading, error, refresh } = useDashboard();
 
   const unread = data.notifications.filter((n) => !n.isRead).length;
   const activeRequests = data.requests.filter(

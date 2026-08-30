@@ -18,10 +18,12 @@ type HeroStatusCardProps = {
 export function HeroStatusCard({ waterStatus, nextSlot, onPressSchedule }: HeroStatusCardProps) {
   const { isDark } = useDashboardTheme();
 
-  const statusLabel = waterStatus ? supplyStatusLabel(waterStatus.status) : 'Water Available';
+  const statusLabel = waterStatus ? supplyStatusLabel(waterStatus.status) : waterStatus === null ? 'Status unavailable' : 'Water Available';
   const kebeleLabel = waterStatus?.kebele ?? 'Kebele 01';
   const nextDistLabel = nextSlot
     ? `${formatTime12(nextSlot.startTime)} - ${formatTime12(nextSlot.endTime)}`
+    : nextSlot === null
+      ? 'No schedule returned'
     : 'Tomorrow • 08:00 AM';
 
   // Vibrant water-themed gradient colors

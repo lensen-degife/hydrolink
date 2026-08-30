@@ -14,6 +14,7 @@ import { listAnnouncements, type Announcement } from '@/services/announcements';
 import { listNotifications, type AppNotification } from '@/services/notifications';
 import { getMe, type UserProfile } from '@/services/users';
 import { ApiError } from '@/services/api';
+import { getStoredUser } from '@/services/auth';
 
 export type DashboardData = {
   user: UserProfile | null;
@@ -50,6 +51,11 @@ export function useDashboardData() {
     setLoading(true);
     setError(null);
     try {
+      const storedUser = await getStoredUser();
+      if (storedUser) {
+        setData((prev) => ({ ...prev, user: storedUser }));
+      }
+
       const results = await Promise.allSettled([
         getMe(),
         getCurrentBill(),
@@ -69,7 +75,7 @@ export function useDashboardData() {
       };
 
       setData({
-        user: val(0, null),
+        user: val(0, storedUser),
         bill: val(1, null),
         payments: val(2, []),
         todaySlots: val(3, []),

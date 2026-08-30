@@ -4,10 +4,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardTheme } from '@/components/dashboard';
 import { useRouter } from 'expo-router';
+import { useDashboard } from '@/contexts/DashboardDataContext';
+import { logout } from '@/services/auth';
 
 export default function ProfileScreen() {
   const { colors, isDark, toggleTheme } = useDashboardTheme();
   const router = useRouter();
+  const { data } = useDashboard();
+  const user = data.user;
+  const displayName = user?.fullName ?? 'HydroLink Customer';
+  const accountDetails = user
+    ? `ID: ${user.accountNumber}${user.kebele ? ` • ${user.kebele}` : ''}`
+    : 'ID: Not loaded';
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/(auth)/login');
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -25,8 +37,11 @@ export default function ProfileScreen() {
               <Ionicons name="person" size={32} color={colors.primary} />
             </View>
             <View>
-              <Text style={[styles.name, { color: colors.textPrimary }]}>Abebe Bikila</Text>
-              <Text style={[styles.id, { color: colors.textMuted }]}>ID: HL-884920 • Kebele 01</Text>
+              <Text style={[styles.name, { color: colors.textPrimary }]}>{displayName}</Text>
+              <Text style={[styles.id, { color: colors.textMuted }]}>{accountDetails}</Text>
+              {user?.email ? (
+                <Text style={[styles.id, { color: colors.textMuted }]}>{user.email}</Text>
+              ) : null}
             </View>
           </View>
 
@@ -55,7 +70,7 @@ export default function ProfileScreen() {
             </Pressable>
 
             <Pressable
-              onPress={() => router.replace('/(auth)/login')}
+              onPress={handleLogout}
               style={[styles.menuItem, { marginTop: 10 }]}
             >
               <Ionicons name="log-out-outline" size={22} color={colors.error} />

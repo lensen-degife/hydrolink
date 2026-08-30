@@ -17,18 +17,22 @@ export function WaterScheduleCard({ slots, waterStatus, onViewWeeklySchedule }: 
 
   const activeSlot = slots?.[0];
   const nextSlot = slots?.[1];
+  const hasBackendSlots = slots !== undefined;
+  const isBackendEmpty = hasBackendSlots && !activeSlot;
   const areaName = waterStatus?.kebele ?? activeSlot?.kebele ?? 'Kebele 01';
   const statusLabelText = waterStatus ? supplyStatusLabel(waterStatus.status) : 'Available';
-  const startTimeText = activeSlot ? formatTime12(activeSlot.startTime) : '08:00 AM';
-  const endTimeText = activeSlot ? formatTime12(activeSlot.endTime) : '01:00 PM';
+  const startTimeText = activeSlot ? formatTime12(activeSlot.startTime) : isBackendEmpty ? '--' : '08:00 AM';
+  const endTimeText = activeSlot ? formatTime12(activeSlot.endTime) : isBackendEmpty ? '--' : '01:00 PM';
   const footnoteText = nextSlot
     ? `Next Zone: ${nextSlot.kebele} scheduled at ${formatTime12(nextSlot.startTime)}`
+    : isBackendEmpty
+      ? 'No distribution windows were returned for today.'
     : 'Next Zone: Kebele 02 scheduled at 02:00 PM';
 
   return (
     <View style={styles.container}>
       <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-        Today's Water Schedule
+        {"Today's Water Schedule"}
       </Text>
 
       <View
@@ -45,7 +49,7 @@ export function WaterScheduleCard({ slots, waterStatus, onViewWeeklySchedule }: 
             </View>
             <View>
               <Text style={[styles.title, { color: colors.textPrimary }]}>
-                Today's Distribution
+                {"Today's Distribution"}
               </Text>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
                 Area: {areaName}

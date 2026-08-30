@@ -12,7 +12,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDashboardTheme } from './ThemeContext';
 import { NewsItem } from './CommunityNewsSection';
 
-type ActiveModal =
+export type ActiveModal =
   | { type: 'pay_bill' }
   | { type: 'schedule' }
   | { type: 'report_issue' }

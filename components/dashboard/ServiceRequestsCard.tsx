@@ -19,10 +19,11 @@ export function ServiceRequestsCard({ requests, onPressRequestDetails }: Service
   );
   const activeCountText = requests ? `${activeReqs.length} Active` : '1 Active';
   const primaryReq = activeReqs[0] ?? requests?.[0];
+  const isBackendEmpty = requests !== undefined && !primaryReq;
 
-  const titleText = primaryReq ? requestTypeLabel(primaryReq.type) : 'Leak Report';
-  const ticketIdText = primaryReq ? `Ticket #${primaryReq.id.slice(-6).toUpperCase()}` : 'Ticket #REQ-4092';
-  const statusTextStr = primaryReq ? requestStatusLabel(primaryReq.status) : 'In Progress';
+  const titleText = primaryReq ? requestTypeLabel(primaryReq.type) : isBackendEmpty ? 'No Requests' : 'Leak Report';
+  const ticketIdText = primaryReq ? `Ticket #${primaryReq.id.slice(-6).toUpperCase()}` : isBackendEmpty ? 'No active ticket' : 'Ticket #REQ-4092';
+  const statusTextStr = primaryReq ? requestStatusLabel(primaryReq.status) : isBackendEmpty ? 'None' : 'In Progress';
 
   return (
     <View style={styles.container}>
@@ -63,7 +64,7 @@ export function ServiceRequestsCard({ requests, onPressRequestDetails }: Service
             <Ionicons name="person-outline" size={16} color={colors.primary} />
             <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Technician Assigned:</Text>
             <Text style={[styles.detailValue, { color: colors.textPrimary }]}>
-              Dawit Alemu (Senior Tech)
+              {isBackendEmpty ? 'No technician assigned' : 'Dawit Alemu (Senior Tech)'}
             </Text>
           </View>
 
@@ -71,7 +72,7 @@ export function ServiceRequestsCard({ requests, onPressRequestDetails }: Service
             <Ionicons name="time-outline" size={16} color={colors.primary} />
             <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Estimated Completion:</Text>
             <Text style={[styles.detailValue, { color: colors.textPrimary }]}>
-              Tomorrow, 11:00 AM
+              {isBackendEmpty ? 'No active request' : 'Tomorrow, 11:00 AM'}
             </Text>
           </View>
         </View>

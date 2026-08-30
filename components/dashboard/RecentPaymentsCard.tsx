@@ -60,7 +60,7 @@ export function RecentPaymentsCard({ payments, onViewAll, onSelectReceipt }: Rec
     date: formatDate(p.paidAt ?? p.createdAt),
   }));
 
-  const transactions: PaymentTransaction[] = mappedTx.length > 0 ? mappedTx : defaultTransactions;
+  const transactions: PaymentTransaction[] = payments === undefined ? defaultTransactions : mappedTx;
 
   return (
     <View style={styles.container}>
@@ -78,7 +78,15 @@ export function RecentPaymentsCard({ payments, onViewAll, onSelectReceipt }: Rec
           DashboardShadows.soft,
         ]}
       >
-        {transactions.map((tx, index) => (
+        {transactions.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Ionicons name="receipt-outline" size={22} color={colors.textMuted} />
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              No payment history was returned for this account.
+            </Text>
+          </View>
+        ) : (
+          transactions.map((tx, index) => (
           <View
             key={tx.id}
             style={[
@@ -124,7 +132,8 @@ export function RecentPaymentsCard({ payments, onViewAll, onSelectReceipt }: Rec
               <Ionicons name="document-text-outline" size={20} color={colors.primary} />
             </Pressable>
           </View>
-        ))}
+          ))
+        )}
 
         {/* View All Button Footer */}
         <Pressable
@@ -225,6 +234,16 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.75,
+  },
+  emptyState: {
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 18,
+  },
+  emptyText: {
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   footerBtn: {
     flexDirection: 'row',
